@@ -11,9 +11,8 @@ function MovieCard({movie}) {
   <div className="movie-card">
   
         <div className="movie-poster">
-            <img src={movie.poster} alt={`${movie.title} Poster`} />
-  
-            <div className="movie-overlay">
+            <img src={`http://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={`${movie.title} Poster`} />
+             <div className="movie-overlay">
                 <button className="favorite-btn" onClick={onPlayClick}>Play</button>
             </div>
         </div>
