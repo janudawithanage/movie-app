@@ -8,40 +8,39 @@ function Home() {
     const [movies, setMovies] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState("latest"); // 'latest' or 'popular'
 
     useEffect(() => {
-        const loadPopularMovies = async () => {
+        const loadMovies = async () => {
+            setLoading(true);
+            setError(null);
             try {
                 const popularMovies = await getPopularMovies();
-                setMovies(popularMovies);
+                let result = [...popularMovies];
+                if (filter === "latest") {
+                    result.sort((a, b) => {
+                        if (!a.release_date) return 1;
+                        if (!b.release_date) return -1;
+                        return new Date(b.release_date) - new Date(a.release_date);
+                    });
+                } // else keep as popular
+                setMovies(result);
             } catch (err) {
-                console.log(err);
                 setError("Failed to load movies...");
-            }
-              finally {
+            } finally {
                 setLoading(false);
-              } 
             }
-        loadPopularMovies();
-    }, []) ;
+        };
+        if (!searchQuery.trim()) {
+            loadMovies();
+        }
+    }, [filter, searchQuery]);
 
 
     // Search as user types
     useEffect(() => {
         const fetchSearch = async () => {
-            if (!searchQuery.trim()) {
-                setLoading(true);
-                setError(null);
-                try {
-                    const popularMovies = await getPopularMovies();
-                    setMovies(popularMovies);
-                } catch (err) {
-                    setError("Failed to load movies...");
-                } finally {
-                    setLoading(false);
-                }
-                return;
-            }
+            if (!searchQuery.trim()) return;
             setLoading(true);
             setError(null);
             try {
@@ -63,6 +62,7 @@ function Home() {
 
     return (
         <div className="home">
+
             <form onSubmit={handleSearch} className='search-form'>
                 <input
                     type="text"
@@ -72,6 +72,42 @@ function Home() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
             </form>
+
+            {/* Filter Buttons */}
+            {!searchQuery.trim() && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <button
+                        onClick={() => setFilter('latest')}
+                        style={{
+                            padding: '0.5rem 1.5rem',
+                            background: filter === 'latest' ? '#e50914' : '#222',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                        }}
+                    >
+                        Latest
+                    </button>
+                    <button
+                        onClick={() => setFilter('popular')}
+                        style={{
+                            padding: '0.5rem 1.5rem',
+                            background: filter === 'popular' ? '#e50914' : '#222',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontWeight: 500,
+                            cursor: 'pointer',
+                            transition: 'background 0.2s',
+                        }}
+                    >
+                        Popular
+                    </button>
+                </div>
+            )}
 
             {loading && <div style={{ textAlign: 'center', margin: '2rem' }}>Loading...</div>}
             {error && <div style={{ color: 'red', textAlign: 'center', margin: '2rem' }}>{error}</div>}
