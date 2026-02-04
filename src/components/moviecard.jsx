@@ -1,25 +1,19 @@
 import '../css/moviecard.css';
-import { useState, useEffect } from 'react';
+import { useContext } from 'react';
+
+import MovieContext from '../contexts/moviecontext';
 
 function MovieCard({ movie }) {
-    const [isFav, setIsFav] = useState(false);
-
-    useEffect(() => {
-        const favs = JSON.parse(localStorage.getItem('favourites') || '[]');
-        setIsFav(favs.some(f => f.id === movie.id));
-    }, [movie.id]);
+    const { favourites, addFavourite, removeFavourite, isFavourite } = useContext(MovieContext);
+    const isFav = isFavourite(movie.id);
 
     function toggleFavourite(e) {
         e.stopPropagation();
-        let favs = JSON.parse(localStorage.getItem('favourites') || '[]');
         if (isFav) {
-            favs = favs.filter(f => f.id !== movie.id);
+            removeFavourite(movie.id);
         } else {
-            favs.push(movie);
+            addFavourite(movie);
         }
-        localStorage.setItem('favourites', JSON.stringify(favs));
-        setIsFav(!isFav);
-        window.dispatchEvent(new Event('favouritesUpdated'));
     }
 
     function onPlayClick() {
