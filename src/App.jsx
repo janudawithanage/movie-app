@@ -1,20 +1,18 @@
 import './css/App.css';
 import Favourites from './pages/favourites';
-import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
+import Browse from './pages/Browse';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/navbar';
 
 function App() {
   return (
     <div>
-    <Navbar />
-    <main className="main-content">
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/favourites' element={<Favourites />} />  
-        
+        <Route path='/' element={<LandingPage />} />
+        <Route path='/browse' element={<><Navbar /><main className="main-content"><Browse /></main></>} />
+        <Route path='/favourites' element={<><Navbar /><main className="main-content"><Favourites /></main></>} />  
       </Routes>
-    </main>
     </div>
   );
 }
